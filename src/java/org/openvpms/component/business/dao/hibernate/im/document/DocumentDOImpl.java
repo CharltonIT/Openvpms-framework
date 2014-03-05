@@ -21,6 +21,10 @@ package org.openvpms.component.business.dao.hibernate.im.document;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.openvpms.component.business.dao.hibernate.im.common.IMObjectDOImpl;
 
+import javax.sql.rowset.serial.SerialBlob;
+import java.sql.Blob;
+import java.sql.SQLException;
+
 
 /**
  * Implementation of the {@link DocumentDO} interface.
@@ -73,6 +77,14 @@ public class DocumentDOImpl extends IMObjectDOImpl implements DocumentDO {
      */
     public void setContents(byte[] contents) {
         this.contents = contents;
+    }
+
+    public void setBlob(Blob blob) throws SQLException {
+        this.contents = blob != null ? blob.getBytes(1, (int) blob.length()) : null;
+    }
+
+    public Blob getBlob() throws SQLException {
+        return contents != null ? new SerialBlob(contents) : null;
     }
 
     /**

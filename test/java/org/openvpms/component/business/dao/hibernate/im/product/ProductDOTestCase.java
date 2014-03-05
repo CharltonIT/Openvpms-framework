@@ -282,6 +282,7 @@ public class ProductDOTestCase extends HibernateInfoModelTestCase {
     private ProductDO createProduct(String name) {
         ProductDO product
                 = new ProductDOImpl(new ArchetypeId("product.basic.1.0"));
+        product.getObjectReference();
         product.setName(name);
         return product;
     }
@@ -296,6 +297,7 @@ public class ProductDOTestCase extends HibernateInfoModelTestCase {
     private ProductPriceDO createProductPrice(int price, boolean fixed) {
         ProductPriceDO result = new ProductPriceDOImpl(
                 new ArchetypeId("productPrice.basic.1.0"));
+        result.getObjectReference();
         result.setName("price");
         result.setFromDate(new Date());
         result.setToDate(new Date());

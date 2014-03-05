@@ -139,6 +139,7 @@ public class ActDOTestCase extends HibernateInfoModelTestCase {
         ActDO act = new ActDOImpl();
         act.setArchetypeId(new ArchetypeId("act.simple.1.0"));
         act.setName(name);
+        act.getObjectReference(); // initialises the linkId
 
         return act;
     }

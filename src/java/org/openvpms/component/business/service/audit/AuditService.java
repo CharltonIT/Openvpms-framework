@@ -129,6 +129,7 @@ public class AuditService implements MethodInterceptor, IAuditService {
                 audit.setService(invocation.getThis().getClass().getName());
                 audit.setUser("unknown");
                 audit.setTimeStamp(new Date());
+                audit.getLinkId();
                 
                 // insert the object
                 dao.insert(audit);

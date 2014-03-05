@@ -37,7 +37,7 @@
                   type="integer"/>
         <property name="errorMessage" access="property" column="error_message"
                   type="string"/>
-        <property name="propertyMap" column="property_map" length="65536"
+        <property name="propertyMap" column="property_map" length="128000"
                   type="org.openvpms.component.business.dao.hibernate.usertype.PropertyMapUserType"/>
     </class>
 

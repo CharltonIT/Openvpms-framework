@@ -305,6 +305,7 @@ public class ActRelationshipDOTestCase extends HibernateInfoModelTestCase {
         ActDO act = new ActDOImpl();
         act.setArchetypeId(new ArchetypeId("act.simple.1.0"));
         act.setName(name);
+        act.getObjectReference();
         return act;
     }
 
@@ -321,6 +322,7 @@ public class ActRelationshipDOTestCase extends HibernateInfoModelTestCase {
         rel.setArchetypeId(new ArchetypeId("act.simpleRel.1.0"));
         source.addSourceActRelationship(rel);
         target.addTargetActRelationship(rel);
+        rel.getObjectReference(); // initialises linkId
         return rel;
     }
 }

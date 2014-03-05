@@ -23,7 +23,7 @@
     <class name="org.openvpms.component.business.dao.hibernate.im.document.DocumentDOImpl"
             proxy="org.openvpms.component.business.dao.hibernate.im.document.DocumentDO"
            table="documents">
-        <cache usage="read-write"/>
+        <!--cache usage="read-write"/-->  <!-- No caching of blobs... -->
         <id name="id" type="long" unsaved-value="-1">
             <column name="document_id"/>
             <generator class="native"/>
@@ -51,8 +51,8 @@
                 <property name="value" length="5000" not-null="true"/>
             </composite-element>
         </map>
-        <property name="contents" type="binary">
-            <column name="contents" sql-type="longblob"/>
+        <property name="blob" type="blob" lazy="false">
+            <column name="contents"/>
         </property>
     </class>
 

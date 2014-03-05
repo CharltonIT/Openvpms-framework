@@ -182,6 +182,7 @@ public class ParticipationDOTestCase extends HibernateInfoModelTestCase {
         result.setArchetypeId(archetypeId);
         result.setEntity(entity);
         result.setAct(act);
+        result.getObjectReference();
         return result;
     }
 
@@ -196,6 +197,7 @@ public class ParticipationDOTestCase extends HibernateInfoModelTestCase {
         EntityDO result = new EntityDOImpl();
         result.setArchetypeId(archetypeId);
         result.setName(name);
+        result.getObjectReference();
         return result;
     }
 
@@ -209,6 +211,7 @@ public class ParticipationDOTestCase extends HibernateInfoModelTestCase {
         ActDO act = new ActDOImpl();
         act.setArchetypeId(new ArchetypeId("act.simple.1.0"));
         act.setName(name);
+        act.getObjectReference();
 
         return act;
     }

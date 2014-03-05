@@ -152,6 +152,7 @@ public class LookupRelationshipDOTestCase extends HibernateInfoModelTestCase {
         result.setArchetypeId(type);
         result.setSource(country);
         result.setTarget(state);
+        result.getObjectReference(); // initialises linkId
         return result;
     }
 

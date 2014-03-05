@@ -33,7 +33,7 @@
         <property name="objectId" column="object_id" type="long"/>
         <property name="service" column="service" type="string"/>
         <property name="operation" column="operation" type="string"/>
-        <property name="user" column="user" type="string"/>
+        <property name="user" column="user_name" type="string"/>
     </class>
 
 </hibernate-mapping>

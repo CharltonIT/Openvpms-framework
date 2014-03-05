@@ -169,6 +169,7 @@ public class UserDAOHibernateTestCase extends HibernateInfoModelTestCase {
         user.setArchetypeId(archetypeId);
         user.setUsername(username);
         user.setPassword(password);
+        user.getObjectReference(); // initialises linkId
         return user;
     }
 

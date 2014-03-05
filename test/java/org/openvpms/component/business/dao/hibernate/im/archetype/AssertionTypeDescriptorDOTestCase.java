@@ -162,6 +162,7 @@ public class AssertionTypeDescriptorDOTestCase
         AssertionTypeDescriptorDO desc = new AssertionTypeDescriptorDOImpl();
         desc.setName(name);
         desc.setPropertyArchetype("openvpms-dum-dum");
+        desc.getObjectReference();
         return desc;
     }
 

@@ -826,9 +826,12 @@ public class ArchetypeServiceActTestCase extends AbstractArchetypeServiceTest {
 
         // now verify the objects can be saved. Save twice to inc version.
         for (int i = 0; i < 2; ++i) {
+            final String title = "bar" + i;
             try {
                 template.execute(new TransactionCallback<Object>() {
                     public Object doInTransaction(TransactionStatus status) {
+                        act1.setTitle(title);
+                        act2.setTitle(title);
                         save(act1);
                         save(act2);
                         return null;
@@ -848,7 +851,7 @@ public class ArchetypeServiceActTestCase extends AbstractArchetypeServiceTest {
         assertEquals(1, act1.getVersion());
         assertEquals(1, act2.getVersion());
 
-        // now verfiy that a subsequent rollback of persistent objects
+        // now verify that a subsequent rollback of persistent objects
         // doesn't reset the ids
         try {
             template.execute(new TransactionCallback<Object>() {

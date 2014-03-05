@@ -304,6 +304,7 @@ public class ArchetypeDescriptorDOTestCase
     @Test
     public void testOBF112() {
         AssertionDescriptorDO assertion = new AssertionDescriptorDOImpl();
+        assertion.getObjectReference();
         assertion.setName("assertionOBF112");
         assertion.addProperty(createAssertionProperty("expression",
                                                       String.class,
@@ -347,6 +348,7 @@ public class ArchetypeDescriptorDOTestCase
         desc.setName(shortName + System.currentTimeMillis() + ".1.0");
         desc.setLatest(true);
         desc.setClassName(this.getClass().getName());
+        desc.getObjectReference();
 
         desc.addNodeDescriptor(
                 createNodeDescriptor("id", "/id", Long.class));
@@ -369,6 +371,7 @@ public class ArchetypeDescriptorDOTestCase
     private NodeDescriptorDO createNodeDescriptor(String name, String path,
                                                   Class type) {
         NodeDescriptorDO desc = new NodeDescriptorDOImpl();
+        desc.getObjectReference();
         desc.setName(name);
         desc.setPath(path);
         desc.setType(type.getName());
@@ -385,6 +388,7 @@ public class ArchetypeDescriptorDOTestCase
      */
     private AssertionDescriptorDO createAssertionDescriptor(String type) {
         AssertionDescriptorDO desc = new AssertionDescriptorDOImpl();
+        desc.getObjectReference();
         desc.setName(type);
         desc.setErrorMessage("An error message");
 
@@ -401,6 +405,7 @@ public class ArchetypeDescriptorDOTestCase
      */
     private AssertionProperty createAssertionProperty(String name, Class type, String value) {
         AssertionProperty prop = new AssertionProperty();
+        prop.getObjectReference();
         prop.setName(name);
         prop.setType(type.getName());
         prop.setValue(value);

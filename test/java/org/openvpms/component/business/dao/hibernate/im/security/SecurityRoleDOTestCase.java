@@ -266,6 +266,7 @@ public class SecurityRoleDOTestCase extends HibernateInfoModelTestCase {
     private SecurityRoleDO createSecurityRole(String name) {
         SecurityRoleDO role = new SecurityRoleDOImpl(
                 new ArchetypeId("openvpms-security-security.role.1.0"));
+        role.getObjectReference();
         role.setName(name);
         return role;
     }
@@ -285,6 +286,7 @@ public class SecurityRoleDOTestCase extends HibernateInfoModelTestCase {
                                                  String archetype) {
         ArchetypeAuthorityDO authority = new ArchetypeAuthorityDOImpl(
                 new ArchetypeId("openvpms-security-security.authority.1.0"));
+        authority.getObjectReference();
         authority.setName(name);
         authority.setServiceName(service);
         authority.setMethod(method);

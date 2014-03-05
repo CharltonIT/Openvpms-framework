@@ -40,6 +40,7 @@ public class LookupDOHelper {
         LookupDO result = new LookupDOImpl();
         result.setArchetypeId(id);
         result.setCode(code);
+        result.getObjectReference(); // initialises linkId
         return result;
     }
 

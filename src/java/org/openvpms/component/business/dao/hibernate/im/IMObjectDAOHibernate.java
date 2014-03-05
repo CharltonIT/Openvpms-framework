@@ -50,14 +50,6 @@ import org.openvpms.component.business.dao.hibernate.im.query.QueryContext;
 import org.openvpms.component.business.dao.im.Page;
 import org.openvpms.component.business.dao.im.common.IMObjectDAO;
 import org.openvpms.component.business.dao.im.common.IMObjectDAOException;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.ClassNameMustBeSpecified;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToDeleteIMObject;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToExecuteNamedQuery;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToExecuteQuery;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToFindIMObjects;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToSaveCollectionOfObjects;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToSaveIMObject;
-import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.InvalidQueryString;
 import org.openvpms.component.business.dao.im.common.ResultCollector;
 import org.openvpms.component.business.domain.im.archetype.descriptor.ArchetypeDescriptor;
 import org.openvpms.component.business.domain.im.common.IMObject;
@@ -79,6 +71,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,6 +80,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.ClassNameMustBeSpecified;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToDeleteIMObject;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToExecuteNamedQuery;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToExecuteQuery;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToFindIMObjects;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToSaveCollectionOfObjects;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.FailedToSaveIMObject;
+import static org.openvpms.component.business.dao.im.common.IMObjectDAOException.ErrorCode.InvalidQueryString;
 
 
 /**
@@ -442,7 +444,7 @@ public class IMObjectDAOHibernate extends HibernateDaoSupport
             if (andRequired) {
                 queryString.append(" and ");
             }
-            queryString.append(" entity.active = 1");
+            queryString.append(" entity.active = true");
         }
 
         if (log.isDebugEnabled()) {
@@ -606,10 +608,11 @@ public class IMObjectDAOHibernate extends HibernateDaoSupport
                               final int firstResult,
                               final int maxResults, final boolean count)
             throws Exception {
-        execute(new HibernateCallback<Object>() {
-
-            public Object doInHibernate(Session session) throws
-                                                         HibernateException {
+        final HibernateTemplate template = getHibernateTemplate();
+        getHibernateTemplate().setExposeNativeSession(true);
+        final HibernateCallback<Object> callback = new HibernateCallback<Object>() {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException, SQLException {
                 collector.setFirstResult(firstResult);
                 collector.setPageSize(maxResults);
                 collector.setSession(session);
@@ -657,6 +660,17 @@ public class IMObjectDAOHibernate extends HibernateDaoSupport
                     resolveDeferredReferences(context);
                 }
                 return null;
+            }
+        };
+        txnTemplate.execute(new TransactionCallback<Object>() {
+            public Object doInTransaction(TransactionStatus status) {
+                return template.execute(new HibernateCallback<Object>() {
+                    public Object doInHibernate(Session session)
+                            throws HibernateException {
+                        checkWriteOperationAllowed(template, session);
+                        return template.execute(callback);
+                    }
+                });
             }
         });
     }
@@ -832,7 +846,7 @@ public class IMObjectDAOHibernate extends HibernateDaoSupport
         queryString.append(clazz);
         queryString.append(" as entity where entity.id = :id and entity.archetypeId.shortName = :shortName");
 
-        return execute(new HibernateCallback<IMObject>() {
+        return executeInTxn(new HibernateCallback<IMObject>() {
             public IMObject doInHibernate(Session session) throws HibernateException {
                 Query query = session.createQuery(queryString.toString());
                 query.setParameter("id", reference.getId());
@@ -1083,6 +1097,21 @@ public class IMObjectDAOHibernate extends HibernateDaoSupport
                     public Object doInHibernate(Session session)
                             throws HibernateException {
                         checkWriteOperationAllowed(template, session);
+                        return template.execute(callback);
+                    }
+                });
+            }
+        });
+    }
+
+    private <T> T executeInTxn(final HibernateCallback<T> callback) {
+        final HibernateTemplate template = getHibernateTemplate();
+        getHibernateTemplate().setExposeNativeSession(true);
+        return txnTemplate.execute(new TransactionCallback<T>() {
+            public T doInTransaction(TransactionStatus status) {
+                return template.execute(new HibernateCallback<T>() {
+                    public T doInHibernate(Session session)
+                            throws HibernateException {
                         return template.execute(callback);
                     }
                 });

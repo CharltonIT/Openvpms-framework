@@ -248,6 +248,7 @@ public class UserDOTestCase extends HibernateInfoModelTestCase {
     private UserDO createUser(String name, String password) {
         UserDO user = new UserDOImpl(
                 new ArchetypeId("openvpms-security-security.user.1.0"));
+        user.getObjectReference();
         user.setUsername(name + System.currentTimeMillis()); // ensure unique
         user.setName(name);
         user.setPassword(password);
