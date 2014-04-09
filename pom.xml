@@ -44,7 +44,7 @@
         <site>
             <id>openvpms-site</id>
             <name>OpenVPMS Maven Site</name>
-            <url>scp://dev.openvpms.org:2233/home/admin/public_html/dev.openvpms.org/public/${pom.artifactId}</url>
+            <url>scp://dev.openvpms.org:2233/home/admin/public_html/dev.openvpms.org/public/${project.artifactId}</url>
         </site>
     </distributionManagement>
 
