@@ -7,5 +7,5 @@ before_install:
     - cd Openvpms-framework
 before_script:
     - cd ..
-    - mysql -u root < /openvpms/src/test/resources/createdb.sql
+    - mysql -u root < openvpms/src/test/resources/createdb.sql
     - cd Openvpms-framework
