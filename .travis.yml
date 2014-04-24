@@ -4,4 +4,4 @@ language: java
 before_install:
     - cd ..
     - git clone --branch=$TRAVIS_BRANCH git://github.com/CharltonIT/openvpms.git openvpms
-    - cd openvpms
+    - cd openvpms-framework
