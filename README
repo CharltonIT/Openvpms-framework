@@ -1,8 +1,8 @@
 Travis Build Status
 Build Status:
 [![Build Status](https://travis-ci.org/CharltonIT/Openvpms-framework.svg?branch=1.7.1-CDIT-beta)](https://travis-ci.org/CharltonIT/Openvpms-framework)
+[![Build Status](https://travis-ci.org/CharltonIT/openvpms.svg?branch=master)](https://travis-ci.org/CharltonIT/openvpms)
 
-========================
 Preparing your workspace
 ========================
 1. Edit/create build.properties and add properties for the database. E.g:
