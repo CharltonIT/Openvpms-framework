@@ -8,4 +8,4 @@ before_install:
 before_script:
     - cd ..
     - mysql -u root < openvpms/src/test/resources/createdb.sql
-    - cd Openvpms-framework
+    - cd $TRAVIS_BUILD_DIR
