@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * Copyright 2013 (C) OpenVPMS Ltd. All Rights Reserved.
+ * Copyright 2014 (C) OpenVPMS Ltd. All Rights Reserved.
  */
 
 package org.openvpms.component.business.service.archetype.helper;
@@ -19,6 +19,9 @@ package org.openvpms.component.business.service.archetype.helper;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.collections.functors.AndPredicate;
+import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openvpms.component.business.domain.archetype.ArchetypeId;
 import org.openvpms.component.business.domain.im.archetype.descriptor.ArchetypeDescriptor;
 import org.openvpms.component.business.domain.im.archetype.descriptor.NodeDescriptor;
@@ -34,6 +37,7 @@ import org.openvpms.component.business.service.archetype.functor.IsA;
 import org.openvpms.component.business.service.archetype.functor.IsActiveRelationship;
 import org.openvpms.component.business.service.archetype.functor.RelationshipRef;
 import org.openvpms.component.system.common.exception.OpenVPMSException;
+import org.openvpms.component.system.common.jxpath.JXPathHelper;
 import org.openvpms.component.system.common.util.AbstractPropertySet;
 import org.openvpms.component.system.common.util.PropertySet;
 
@@ -414,6 +418,7 @@ public class IMObjectBean {
     /**
      * Returns the values of a collection node, converted to the supplied type.
      *
+     * @param <T> extends ImObject
      * @param name the node name
      * @param type the expected object type
      * @return the collection corresponding to the node
@@ -445,6 +450,7 @@ public class IMObjectBean {
     /**
      * Returns the values of a collection node that match the supplied predicate.
      *
+     * @param <T>       Object extends ImObject
      * @param name      the node name
      * @param predicate the predicate
      * @param type      the expected object type
@@ -464,9 +470,9 @@ public class IMObjectBean {
      * @throws IMObjectBeanException if the node doesn't exist
      */
     public IMObject getValue(String name, Predicate predicate) {
-        for (IMObject object : getValues(name)) {
-            if (predicate.evaluate(object)) {
-                return object;
+        for (IMObject lobject : getValues(name)) {
+            if (predicate.evaluate(lobject)) {
+                return lobject;
             }
         }
         return null;
@@ -646,6 +652,7 @@ public class IMObjectBean {
      * Returns the active source objects from each active {@link IMObjectRelationship} for the specified node.
      * If a source reference cannot be resolved, it will be ignored.
      *
+     * @param <T>  Extends IMObject
      * @param node the relationship node
      * @param type the object type
      * @return a list of active source objects
@@ -672,6 +679,7 @@ public class IMObjectBean {
      * Returns the active source objects from each {@link PeriodRelationship} for the specified node that is active at
      * the specified time.
      *
+     * @param <T>   The type of Object to list  must extend IMOBject
      * @param node the relationship node
      * @param time the time
      * @param type the object type
@@ -700,6 +708,7 @@ public class IMObjectBean {
      * Returns the source objects from each {@link PeriodRelationship} for the specified node that is active at the
      * specified time.
      *
+     * @param <T>    The type of Object to list  must extend IMOBject
      * @param node   the relationship node
      * @param time   the time
      * @param active determines if the objects must be active
@@ -742,6 +751,7 @@ public class IMObjectBean {
      * Returns the source objects from each {@link IMObjectRelationship} for the specified node that matches the
      * specified predicate.
      *
+     * @param <T>       The type of Object to list  must extend IMOBject
      * @param node      the relationship node
      * @param predicate the predicate
      * @param active    determines if the objects must be active
@@ -758,6 +768,8 @@ public class IMObjectBean {
      * Returns the active source objects from each {@link IMObjectRelationship} for the specified node, keyed on their
      * relationship.
      *
+     * @param <T>              the IMObect to map
+     * @param <R>              the IMObjectRealtionship to map
      * @param node             the relationship node
      * @param type             the source object type
      * @param relationshipType the relationship object type
@@ -772,6 +784,8 @@ public class IMObjectBean {
      * Returns the active source objects from each {@link IMObjectRelationship} for the specified node, keyed
      * on their relationship.
      *
+     * @param <T>
+     * @param <R>
      * @param node             the relationship node
      * @param type             the source object type
      * @param relationshipType the relationship object type
@@ -800,6 +814,7 @@ public class IMObjectBean {
      * Returns the active target objects from each active {@link IMObjectRelationship} for the specified node.. If a
      * target reference cannot be resolved, it will be ignored.
      *
+     * @param <R>
      * @param node       the relationship node
      * @param comparator a comparator to sort relationships. May be {@code null}
      * @return a list of active target objects
@@ -813,6 +828,7 @@ public class IMObjectBean {
      * Returns the active target objects from each active {@link IMObjectRelationship} for the specified node. If a
      * target reference cannot be resolved, it will be ignored.
      *
+     * @param <T>
      * @param node the relationship node
      * @param type the object type
      * @return a list of active target objects
@@ -826,6 +842,8 @@ public class IMObjectBean {
      * Returns the active target objects from each active {@link IMObjectRelationship} for the specified node. If a
      * target reference cannot be resolved, it will be ignored.
      *
+     * @param <T>
+     * @param <R>
      * @param node       the relationship node
      * @param type       the object type
      * @param comparator if non-null, specifies a comparator to sort relationships
@@ -854,6 +872,7 @@ public class IMObjectBean {
      * Returns the active target objects from each {@link PeriodRelationship} for the specified node that is active at
      * the specified time.
      *
+     * @param <T>
      * @param node the relationship node
      * @param time the time
      * @param type the object type
@@ -882,6 +901,7 @@ public class IMObjectBean {
      * Returns the target objects from each {@link PeriodRelationship} for the specified node that is active at the
      * specified time.
      *
+     * @param <T>
      * @param node   the relationship node
      * @param time   the time
      * @param active determines if the objects must be active
@@ -910,6 +930,7 @@ public class IMObjectBean {
      * Returns the active target objects from each relationship for the specified node that matches the specified
      * predicate.
      *
+     * @param <T>
      * @param node      the relationship node
      * @param predicate the predicate
      * @param type      the object type
@@ -938,6 +959,7 @@ public class IMObjectBean {
      * Returns the target objects from each {@link IMObjectRelationship} for the specified node that matches the
      * specified predicate.
      *
+     * @param <T>
      * @param node      the relationship node
      * @param predicate the predicate
      * @param active    determines if the objects must be active
@@ -954,6 +976,8 @@ public class IMObjectBean {
      * Returns the target objects from each {@link IMObjectRelationship} for the specified node that matches the
      * specified predicate.
      *
+     * @param <T>
+     * @param <R>
      * @param node       the relationship node
      * @param predicate  the predicate
      * @param active     determines if the objects must be active
@@ -971,6 +995,8 @@ public class IMObjectBean {
      * Returns the active target objects from each {@link IMObjectRelationship} for the specified node, keyed on their
      * relationship.
      *
+     * @param <T>
+     * @param <R>
      * @param node             the relationship node
      * @param type             the target object type
      * @param relationshipType the relationship object type
@@ -985,6 +1011,8 @@ public class IMObjectBean {
      * Returns the active target objects from each {@link IMObjectRelationship} for the specified node, keyed
      * on their relationship.
      *
+     * @param <T>
+     * @param <R>
      * @param node             the relationship node
      * @param type             the target object type
      * @param relationshipType the relationship object type
@@ -995,6 +1023,33 @@ public class IMObjectBean {
             String node, Class<T> type, Class<R> relationshipType, boolean active) {
         List<R> relationships = getValues(node, relationshipType);
         return getRelationshipObjects(relationships, getDefaultPredicate(active), TARGET, active, type);
+    }
+
+    /**
+     * Returns the source object reference from the first active {@link IMObjectRelationship} for the specified
+     * relationship node.
+     *
+     * @param node the relationship node name
+     * @return the source object reference, or {@code null} if none is found
+     * @throws ArchetypeServiceException for any archetype service error
+     */
+    public IMObjectReference getNodeSourceObjectRef(String node) {
+        return getNodeSourceObjectRef(node, true);
+    }
+
+    /**
+     * Returns the source object reference from the first {@link IMObjectRelationship} for the specified
+     * relationship node.
+     *
+     * @param node   the relationship node name
+     * @param active determines if the relationship must be active
+     * @return the source object reference, or {@code null} if none is found
+     * @throws ArchetypeServiceException for any archetype service error
+     */
+    public IMObjectReference getNodeSourceObjectRef(String node, boolean active) {
+        List<IMObjectRelationship> relationships = getValues(node, getDefaultPredicate(active),
+                                                             IMObjectRelationship.class);
+        return getRelatedRef(relationships, null, SOURCE);
     }
 
     /**
@@ -1042,6 +1097,31 @@ public class IMObjectBean {
     }
 
     /**
+     * Returns the target object reference from the first active {@link IMObjectRelationship} for the specified node.
+     *
+     * @param node the relationship node
+     * @return the target reference, or {@code null} if none is found
+     * @throws ArchetypeServiceException for any archetype service error
+     */
+    public IMObjectReference getNodeTargetObjectRef(String node) {
+        return getNodeTargetObjectRef(node, true);
+    }
+
+    /**
+     * Returns the target object reference from the first {@link IMObjectRelationship} for the specified node.
+     *
+     * @param node   the relationship node
+     * @param active determines if the relationship must be active
+     * @return the target reference, or {@code null} if none is found
+     * @throws ArchetypeServiceException for any archetype service error
+     */
+    public IMObjectReference getNodeTargetObjectRef(String node, boolean active) {
+        List<IMObjectRelationship> relationships = getValues(node, getDefaultPredicate(active),
+                                                             IMObjectRelationship.class);
+        return getRelatedRef(relationships, null, TARGET);
+    }
+
+    /**
      * Returns the target object references from each {@link PeriodRelationship} that is active at the specified time,
      * for the specified node.
      *
@@ -1068,6 +1148,8 @@ public class IMObjectBean {
     /**
      * Returns the active source objects from each relationship that matches the specified short name.
      *
+     * @param <T>
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the short name
      * @param type          the expected object type
@@ -1082,6 +1164,8 @@ public class IMObjectBean {
     /**
      * Returns the active source objects from each relationship that matches the specified short names.
      *
+     * @param <T>
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the short names
      * @param type          the expected object type
@@ -1096,6 +1180,8 @@ public class IMObjectBean {
     /**
      * Returns the source objects from each relationship that matches the specified short names.
      *
+     * @param <T>
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the short names
      * @param active        determines if the relationship and source object must be active
@@ -1112,6 +1198,8 @@ public class IMObjectBean {
     /**
      * Returns the active target objects from each relationship that matches the specified short names.
      *
+     * @param <T>
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param type          the expected object type
@@ -1127,6 +1215,8 @@ public class IMObjectBean {
     /**
      * Returns the active target objects from each relationship that matches the specified short names.
      *
+     * @param <T>
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param type          the expected object type
@@ -1142,6 +1232,8 @@ public class IMObjectBean {
     /**
      * Returns the active target objects from each relationship that matches the specified short names.
      *
+     * @param <T>
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param active        determines if the relationship and target object must be active
@@ -1160,6 +1252,7 @@ public class IMObjectBean {
      * Returns the source object from the first active relationship with active source object, for the specified
      * relationship short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @return the source object, or {@code null} if none is found
@@ -1172,6 +1265,7 @@ public class IMObjectBean {
     /**
      * Returns the source object from the first relationship for the specified relationship short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param active        determines if the relationship and object must be active
@@ -1187,6 +1281,7 @@ public class IMObjectBean {
      * Returns the source object from the first active relationship matching the specified relationship short names and
      * having an active source object.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @return the source object, or {@code null} if none is found
@@ -1199,6 +1294,7 @@ public class IMObjectBean {
     /**
      * Returns the source object from the first relationship matching the specified relationship short names.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param active        determines if the relationship and source object must be active
@@ -1214,6 +1310,7 @@ public class IMObjectBean {
      * Returns the target object from the first active relationship with active target object, for the specified
      * relationship short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @return the active object, or {@code null} if none is found
@@ -1226,6 +1323,7 @@ public class IMObjectBean {
     /**
      * Returns the target object from the first relationship for the specified relationship short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param active        determines if the relationship and object must be active
@@ -1241,6 +1339,7 @@ public class IMObjectBean {
      * Returns the target object from the first active relationship matching the specified relationship short names and
      * having an active target object.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @return the target object, or {@code null} if none is found
@@ -1253,6 +1352,7 @@ public class IMObjectBean {
     /**
      * Returns the target object from the first relationship matching the specified relationship short names.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param active        determines if the relationship and target object must be active
@@ -1268,6 +1368,7 @@ public class IMObjectBean {
      * Returns the source object from the first relationship matching the specified short name. The relationship must be
      * active at the specified time, and have an active source object.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param time          the time
@@ -1284,6 +1385,7 @@ public class IMObjectBean {
      * Returns the source object from the first relationship matching the specified short name. The relationship must be
      * active at the specified time.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param time          the time
@@ -1301,6 +1403,7 @@ public class IMObjectBean {
      * Returns the source object from the first relationship matching the specified short names. The relationship must
      * be active at the specified time, and have an active source object.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param time          the time
@@ -1317,6 +1420,7 @@ public class IMObjectBean {
      * Returns the source object from the first relationship matching the specified short names. The relationship must
      * be active at the specified time.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param time          the time
@@ -1334,6 +1438,7 @@ public class IMObjectBean {
      * Returns the source object from the first relationship matching the specified short name. The relationship must be
      * active at the specified time, and have an active target object.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param time          the time
@@ -1351,6 +1456,7 @@ public class IMObjectBean {
      * matching the specified short name. The relationship must be active at
      * the specified time.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param time          the time
@@ -1369,6 +1475,7 @@ public class IMObjectBean {
      * matching the specified short names. The relationship must be active at
      * the specified time, and have an active target object.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param time          the time
@@ -1385,6 +1492,7 @@ public class IMObjectBean {
      * Returns the target object from the first relationship matching the specified short names. The relationship must
      * be active at the specified time.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param time          the time
@@ -1401,6 +1509,7 @@ public class IMObjectBean {
     /**
      * Returns the source object reference from the first active object relationship matching the specified short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @return the source reference, or {@code null} if none is found
@@ -1414,6 +1523,7 @@ public class IMObjectBean {
     /**
      * Returns the source object reference from the first relationship matching the specified short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param active        determines if the relationship must be active
@@ -1428,6 +1538,7 @@ public class IMObjectBean {
     /**
      * Returns the source object reference from the first relationship matching the specified short names.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param active        determines if the relationship must be active
@@ -1442,6 +1553,7 @@ public class IMObjectBean {
     /**
      * Returns the target object reference from the first active object relationship matching the specified short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @return the target reference, or {@code null} if none is found
@@ -1455,6 +1567,7 @@ public class IMObjectBean {
     /**
      * Returns the target object reference from the first relationship matching the specified short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortName     the relationship short name
      * @param active        determines if the relationship must be active
@@ -1469,6 +1582,7 @@ public class IMObjectBean {
     /**
      * Returns the target object reference from the first relationship matching the specified short name.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the relationship short names
      * @param active        determines if the relationship must be active
@@ -1539,6 +1653,41 @@ public class IMObjectBean {
     }
 
     /**
+     * Evaluates the default value if a node, if it has one.
+     *
+     * @param name the node name
+     * @return the evaluation of {@link NodeDescriptor#getDefaultValue()} (which may evaluate {@code null}),
+     *         or {@code null} if the node doesn't have a default value
+     * @throws IMObjectBeanException if the descriptor doesn't exist
+     */
+    public Object getDefaultValue(String name) {
+        Object result = null;
+        NodeDescriptor node = getNode(name);
+        String expression = node.getDefaultValue();
+        if (!StringUtils.isEmpty(expression)) {
+            result = evaluate(expression);
+        }
+        return result;
+    }
+
+    /**
+     * Determines if a node is unchanged from its default value.
+     *
+     * @param name the node name
+     * @return {@code true} if the node is unchanged from its default value
+     */
+    public boolean isDefaultValue(String name) {
+        boolean result = false;
+        NodeDescriptor node = getNode(name);
+        String expression = node.getDefaultValue();
+        if (!StringUtils.isEmpty(expression)) {
+            Object value = evaluate(expression);
+            result = ObjectUtils.equals(getValue(name), value);
+        }
+        return result;
+    }
+
+    /**
      * Saves the object.
      * <p/>
      * Any derived nodes will have their values derived prior to the object
@@ -1555,6 +1704,7 @@ public class IMObjectBean {
     /**
      * Resolves a reference, verifying the object is of the expected type.
      *
+     * @param <T>
      * @param ref    the reference to resolve
      * @param type   the expected object type
      * @param active determines if the object must be active
@@ -1565,13 +1715,13 @@ public class IMObjectBean {
     @SuppressWarnings("unchecked")
     protected <T extends IMObject> T resolve(IMObjectReference ref, Class<T> type, boolean active) {
         T result = null;
-        IMObject object = resolve(ref);
-        if (object != null) {
-            if (!type.isInstance(object)) {
-                throw new IMObjectBeanException(InvalidClassCast, type.getName(), object.getClass().getName());
+        IMObject lobject = resolve(ref);
+        if (lobject != null) {
+            if (!type.isInstance(lobject)) {
+                throw new IMObjectBeanException(InvalidClassCast, type.getName(), lobject.getClass().getName());
             }
-            if (active && object.isActive() || !active) {
-                result = (T) object;
+            if (active && lobject.isActive() || !active) {
+                result = (T) lobject;
             }
         }
         return result;
@@ -1623,6 +1773,8 @@ public class IMObjectBean {
     /**
      * Returns all objects for the specified relationship node that match the specified criteria.
      *
+     * @param <T>
+     * @param <R>
      * @param node       the relationship node
      * @param predicate  the criteria to filter relationships
      * @param accessor   the object accessor
@@ -1643,6 +1795,7 @@ public class IMObjectBean {
     /**
      * Returns all related references for the specified node that match the specified criteria.
      *
+     * @param <R>
      * @param node       the relationship node
      * @param predicate  the criteria
      * @param accessor   the object accessor
@@ -1662,6 +1815,7 @@ public class IMObjectBean {
     /**
      * Returns all object references from the supplied relationships that match the specified criteria.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param predicate     the criteria
      * @param accessor      the object accessor
@@ -1683,6 +1837,8 @@ public class IMObjectBean {
     /**
      * Returns all objects for the specified relationships that match the specified criteria.
      *
+     * @param <R>
+     * @param <T>
      * @param relationships the relationships to search
      * @param predicate     the criteria to filter relationships
      * @param accessor      the object accessor
@@ -1715,6 +1871,7 @@ public class IMObjectBean {
      * Returns all object references from the supplied relationships that match the specified criteria, keyed
      * on their relationship.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param predicate     the criteria
      * @param accessor      the object accessor
@@ -1752,6 +1909,8 @@ public class IMObjectBean {
     /**
      * Returns all objects for the specified relationships that match the specified criteria.
      *
+     * @param <R>
+     * @param <T>
      * @param relationships the relationships to search
      * @param predicate     the criteria to filter relationships
      * @param accessor      the object accessor
@@ -1773,6 +1932,7 @@ public class IMObjectBean {
      * <p/>
      * If an object cannot be resolved, or doesn't match the active criteria, it is ignored.
      *
+     * @param <T>
      * @param refs   the references to resolve
      * @param type   the expected object type
      * @param active determines if the objects must be active
@@ -1801,6 +1961,7 @@ public class IMObjectBean {
      * <p/>
      * If active is {@code false}, then an active object will be returned in preference to an inactive one.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param predicate     the predicate
      * @param accessor      the relationship reference accessor
@@ -1885,15 +2046,16 @@ public class IMObjectBean {
     /**
      * Returns the first object reference from the supplied relationship that matches the specified criteria.
      *
+     * @param <R>
      * @param relationships the relationships
-     * @param predicate     the criteria
+     * @param predicate     the criteria. May be {@code null}
      * @param accessor      the relationship reference accessor
      * @return the matching reference, or {@code null}
      */
     protected <R extends IMObjectRelationship> IMObjectReference getRelatedRef(
             Collection<R> relationships, Predicate predicate, RelationshipRef accessor) {
         for (R relationship : relationships) {
-            if (predicate.evaluate(relationship)) {
+            if (predicate == null || predicate.evaluate(relationship)) {
                 IMObjectReference reference = accessor.transform(relationship);
                 if (reference != null) {
                     return reference;
@@ -1906,6 +2068,7 @@ public class IMObjectBean {
     /**
      * Returns the first object reference matching the specified criteria.
      *
+     * @param <R>
      * @param relationships the relationships
      * @param shortNames    the short names
      * @param active        determines if the relationship must be active
@@ -1925,6 +2088,7 @@ public class IMObjectBean {
     /**
      * Selects all objects matching a predicate.
      *
+     * @param <T>
      * @param objects   the objects to match
      * @param predicate the predicate
      * @return the objects matching the predicate
@@ -1942,6 +2106,7 @@ public class IMObjectBean {
     /**
      * Selects the first objects matching a predicate.
      *
+     * @param <T>
      * @param objects   the objects to match
      * @param predicate the predicate
      * @return the first object matching the predicate or {@code null} if none is found
@@ -2013,10 +2178,22 @@ public class IMObjectBean {
         NodeDescriptor node = getArchetype().getNodeDescriptor(name);
         if (node == null) {
             String shortName = object.getArchetypeId().getShortName();
-            throw new IMObjectBeanException(NodeDescriptorNotFound, name,
-                                            shortName);
+            throw new IMObjectBeanException(NodeDescriptorNotFound, name, shortName);
         }
         return node;
+    }
+
+    /**
+     * Evaluates a JXPath expression.
+     *
+     * @param expression the expression
+     * @return the result of the expression
+     */
+    private Object evaluate(String expression) {
+        Object result;
+        JXPathContext context = JXPathHelper.newContext(object);
+        result = context.getValue(expression);
+        return result;
     }
 
     /**
