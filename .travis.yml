@@ -7,5 +7,7 @@ before_install:
     - cd $TRAVIS_BUILD_DIR
 before_script:
     - cd ..
-    - mysql -u root < openvpms/src/test/resources/createdb.sql
+    - mysql -uroot < openvpms/src/test/resources/createdb.sql
+    - mysql -e "create database IF NOT EXISTS openvpms-1_8;" -uroot
+    - mysql -e "GRANT ALL ON openvpms-1_8.* TO 'openvpms'@'localhost'; -uroot
     - cd $TRAVIS_BUILD_DIR
