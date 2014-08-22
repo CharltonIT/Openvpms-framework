@@ -29,6 +29,6 @@ Connector/J 5.1.5-bin JDBC driver .
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Current Build Status:
-[![Build Status](https://travis-ci.org/CharltonIT/openvpms-framework.svg?branch=master)](https://travis-ci.org/CharltonIT/openvpms-framework)
+[![Build Status](https://travis-ci.org/CharltonIT/Openvpms-framework.svg?branch=master)](https://travis-ci.org/CharltonIT/Openvpms-framework)
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
