@@ -12,8 +12,6 @@
  *  License.
  *
  *  Copyright 2005 (C) OpenVPMS Ltd. All Rights Reserved.
- *
- *  $Id: MemorySecurityServiceTestCase.java 328 2005-12-07 13:31:09Z jalateras $
  */
 
 package org.openvpms.component.business.service.security;
@@ -27,12 +25,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Random;
+
 
 /**
  * Exercises the security test cases using a hibernate user details service.
  *
  * @author <a href="mailto:support@openvpms.org>OpenVPMS Team</a>
- * @version $LastChangedDate: 2005-12-08 00:31:09 +1100 (Thu, 08 Dec 2005) $
  */
 @ContextConfiguration("hibernate-security-service-appcontext.xml")
 public class HibernateSecurityServiceTestCase extends SecurityServiceTests {
@@ -86,7 +85,9 @@ public class HibernateSecurityServiceTestCase extends SecurityServiceTests {
     private User createUser(String name, String password) {
         User user = new User();
         user.setArchetypeIdAsString("security.user.1.0");
-        user.setUsername(name + System.currentTimeMillis()); // ensure unique
+        int seed = new Random().nextInt();
+        name = name + seed;   // generate a unique name (hopefully...)
+        user.setUsername(name);
         user.setName(name);
         user.setPassword(password);
 
