@@ -1,0 +1,11 @@
+## YAML Template.
+---
+language: java
+before_install:
+    - cd ..
+    - git clone --branch=$TRAVIS_BRANCH git://github.com/CharltonIT/openvpms.git openvpms
+    - cd $TRAVIS_BUILD_DIR
+before_script:
+    - cd ..
+    - mysql -u root < openvpms/src/test/resources/createdb.sql
+    - cd $TRAVIS_BUILD_DIR

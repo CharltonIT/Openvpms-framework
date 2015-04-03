@@ -25,4 +25,10 @@ Database Testing
 ================
 The openvpms-framework component has been tested with mysql 5.0.24 using the
 Connector/J 5.1.5-bin JDBC driver .
-   
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Current Build Status:
+[![Build Status](https://travis-ci.org/CharltonIT/Openvpms-framework.svg?branch=master)](https://travis-ci.org/CharltonIT/Openvpms-framework)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
